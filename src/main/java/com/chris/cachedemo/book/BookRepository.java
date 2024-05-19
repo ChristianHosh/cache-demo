@@ -1,4 +1,8 @@
 package com.chris.cachedemo.book;
 
-public interface BookRepository extends org.springframework.data.jpa.repository.JpaRepository<com.chris.cachedemo.book.Book, java.lang.Long> ,org.springframework.data.jpa.repository.JpaSpecificationExecutor<com.chris.cachedemo.book.Book> {
-  }
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface BookRepository extends JpaRepository<Book, Long>{
+}

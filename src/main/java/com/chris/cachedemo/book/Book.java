@@ -1,4 +1,4 @@
-package com.chris.cachedemo.todo;
+package com.chris.cachedemo.book;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -16,9 +16,12 @@ public class Book {
   private Long id;
 
   @Column(name = "title")
-  private String title;
+  private String title = "";
 
   @Column(name = "summary", length = 510)
-  private String summary;
+  private String summary = "";
+
+  @Column(name = "published")
+  private Boolean published = false;
 
 }
