@@ -23,6 +23,22 @@ public class RandomNumberController {
 
   public record NumberDto(int number) {}
 
+  public record ErrorDto(
+      int status,
+      String error,
+      String message,
+      long timestamp
+  ) {
+    static ErrorDto build() {
+      return new ErrorDto(
+          HttpStatus.TOO_MANY_REQUESTS.value(),
+          HttpStatus.TOO_MANY_REQUESTS.getReasonPhrase(),
+          "please try again later",
+          System.currentTimeMillis()
+      );
+    }
+  }
+
   private final Map<String, Bucket> cache = new ConcurrentHashMap<>();
 
   private Bucket resolveBucket(ServletRequest request) {
@@ -31,14 +47,14 @@ public class RandomNumberController {
       return bucket;
 
     cache.put(request.getRemoteAddr(), Bucket.builder()
-        .addLimit(Bandwidth.classic(20, Refill.intervally(5, Duration.ofSeconds(5))))
+        .addLimit(Bandwidth.classic(10, Refill.intervally(5, Duration.ofSeconds(15))))
         .build());
 
     return cache.get(request.getRemoteAddr());
   }
 
   @GetMapping
-  public ResponseEntity<NumberDto> getRandomNumber(
+  public ResponseEntity<Object> getRandomNumber(
       @RequestParam(name = "base", defaultValue = "0") int base,
       @RequestParam(name = "limit", defaultValue = "100") int limit,
       HttpServletRequest request
@@ -49,6 +65,7 @@ public class RandomNumberController {
       return ResponseEntity.ok(new NumberDto(random.nextInt(base, limit)));
     }
 
-    return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
+    return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+        .body(ErrorDto.build());
   }
 }
