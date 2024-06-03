@@ -42,15 +42,9 @@ public class RandomNumberController {
   private final Map<String, Bucket> cache = new ConcurrentHashMap<>();
 
   private Bucket resolveBucket(ServletRequest request) {
-    Bucket bucket = cache.get(request.getRemoteAddr());
-    if (bucket != null)
-      return bucket;
-
-    cache.put(request.getRemoteAddr(), Bucket.builder()
-        .addLimit(Bandwidth.classic(10, Refill.intervally(5, Duration.ofSeconds(15))))
-        .build());
-
-    return cache.get(request.getRemoteAddr());
+    return cache.computeIfAbsent(request.getRemoteAddr(), (address) -> Bucket.builder()
+       .addLimit(Bandwidth.classic(10, Refill.intervally(5, Duration.ofSeconds(15))))
+       .build());
   }
 
   @GetMapping
